@@ -4,6 +4,7 @@ from django.contrib.auth.hashers import make_password
 from .models import *
 from .serializers import *
 
+ 
 # USER CRUD
 class UserView(APIView):
     def post(self, request):
@@ -347,3 +348,11 @@ class SubCategoryView(APIView):
             obj = SubCategory.objects.all()
             obj.delete()
             return Response('all data is deleted successfully')
+
+# Create your views here.
+
+
+@api_view(["GET"])
+def home(request):
+    return Response("hello world")
+
