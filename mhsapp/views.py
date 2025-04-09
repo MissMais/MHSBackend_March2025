@@ -4,6 +4,21 @@ from django.contrib.auth.hashers import make_password
 from .models import *
 from .serializers import *
 
+from django.contrib.auth import authenticate
+from rest_framework.permissions import AllowAny,IsAuthenticated
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import TokenError
+
+
+
+
+# @api_view(["GET"])
+# def home(request):
+#     return Response("hello world")
+
+class HomeView(APIView):
+    def get(self,request):
+        return Response("hello world")
  
 # USER CRUD
 class UserView(APIView):
@@ -352,7 +367,44 @@ class SubCategoryView(APIView):
 # Create your views here.
 
 
-@api_view(["GET"])
-def home(request):
-    return Response("hello world")
+class LoginView(APIView):
+    # permission_classes = [AllowAny]  # Allow anyone to attempt login
+
+    def post(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
+
+        user = authenticate(username=username, password=password)
+
+        if user is not None:
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+            })
+        else:
+            return Response({"error": "Invalid username or password"}, status=400)
+
+
+# Username and password for login
+# {
+# "username":"Sahil123",
+# "password":"123"
+# }
+
+class LogoutView(APIView):
+    # permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        refresh_token = request.data.get('refresh')
+
+        if not refresh_token:
+            return Response({'error': 'Refresh token is required'}, status=400)
+
+        try:
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response({'message': 'Logout successful'})
+        except TokenError:
+            return Response({'error': 'Invalid or expired token'}, status=400)
 
