@@ -125,10 +125,30 @@ class CustomerView(APIView):
             user.delete()
             return Response(customer_serializer.errors)
 
-    def get(self, request):
-        customers = Customer.objects.all()
-        serializer = CustomerSerializer(customers, many=True)
-        return Response(serializer.data)
+    def get(self, request, pk = None):
+        if pk:
+            customers = Customer.objects.get(pk = pk)
+            serializer = CustomerSerializer(customers)
+            return Response(serializer.data)
+
+        else:    
+            customers = Customer.objects.all()
+            serializer = CustomerSerializer(customers, many=True)
+            return Response(serializer.data)
+    
+
+    def put(self, request, pk):
+        customer = Customer.objects.get(pk=pk)
+        serializer = CustomerSerializer(customer, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'Customer updated successfully'})
+        return Response(serializer.errors)
+
+    def delete(self, request, pk):
+        customer = Customer.objects.get(pk=pk)
+        customer.delete()
+        return Response({'message': 'Customer deleted successfully'})
 
 
 # EMPLOYEE PAYLOAD :-
@@ -311,15 +331,20 @@ class SubCategoryView(APIView):
             return Response({'message': 'SubCategory created successfully', 'data': serializer.data})
         return Response(serializer.errors)
 
-    def get(self,request,pk = None):
+    def get(self, request, pk=None):
         if pk:
             obj = SubCategory.objects.get(pk = pk)
             serializer = SubCategorySerializer(obj)
             return Response(serializer.data)
+
+        search_query = request.query_params.get('search', '')
+        if search_query:
+            subcategories = SubCategory.objects.filter(Sub_Category_Name__icontains=search_query)
         else:
-            obj = SubCategory.objects.all()
-            serializer = SubCategorySerializer(obj,many=True)
-            return Response(serializer.data)
+            subcategories = SubCategory.objects.all()
+
+        serializer = SubCategorySerializer(subcategories, many=True)
+        return Response(serializer.data)
 
     def put(self, request, pk):
         try:

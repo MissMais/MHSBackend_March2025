@@ -86,10 +86,8 @@ CORS_ALLOWED_ORIGINS = [
 
 DATABASES = {
     'default': {
-        "ENGINE": "mssql",
-        "HOST": r"DESKTOP-D031GLK\SQLEXPRESS",
-        "PORT": "",
-        "NAME": "mhs_ecom_db",
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / "db.sqlite3",
     }
 }
 
@@ -135,4 +133,4 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-AUTH_USER_MODEL = "myapp.User"
+AUTH_USER_MODEL = "mhsapp.User"
