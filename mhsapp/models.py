@@ -35,3 +35,10 @@ class Category(models.Model):
 class SubCategory(models.Model):
     Sub_Category_Name = models.CharField(max_length=100)
     Category_id = models.ForeignKey(Category, on_delete=models.CASCADE)
+
+class Product(models.Model):
+    Product_Description=models.CharField(max_length=500)
+    Sub_Category_id=models.ForeignKey(SubCategory, on_delete=models.CASCADE)
+    Availability=models.IntegerField()
+    Stock=models.IntegerField()
+    Price=models.IntegerField()

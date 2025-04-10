@@ -58,4 +58,12 @@ class SubCategorySerializer(serializers.ModelSerializer):
             'id', 'Sub_Category_Name', 'Category_id',
             'Category'
         ]
-        
+    
+# Product Serializer
+class ProductSerializer(serializers.ModelSerializer):
+
+    Sub_Category_id=SubCategorySerializer(read_only=True)
+
+    class Meta:
+        model=Product
+        fields=['Product_Description','Sub_Category_id','Availability','Stock','Price']
