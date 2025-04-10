@@ -497,6 +497,48 @@ class Variation_Option_View(APIView):
             obj.delete()
             return Response('all data is deleted successfully')
 
+class ProductView(APIView):
+    def get(self,request,pk=None):
+        if pk:
+            obj=Product.objects.get(pk=pk)
+            serializer=ProductSerializer(obj,many=False)
+            return Response(serializer.data)
+        else:
+            obj=Product.objects.all()
+            serializer=ProductSerializer(obj,many=True)
+            return Response(serializer.data)
+        
+    def post(self,request):
+        data=request.data
+        serializer=ProductSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response("data added successfully")
+        return Response(serializer.errors)
+    
+    def put(self,request,pk=None):
+        data=request.data
+        obj=Product.objects.get(pk=pk)
+        serializer=ProductSerializer(obj,data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response("data updated successfully")
+        return Response(serializer.errors)
+    
+    def delete(self,request,pk=None):
+        obj=Product.objests.get(pk=pk)
+        obj.delete()
+        return Response("data deleted successfully")
+
+# product payload
+# {
+# "Product_Description":"good quality clothes",
+# "Sub_Category_id":1,
+# "Availability":13,
+# "Stock":45,
+# "Price":4000
+# }
+        
 
 class LoginView(APIView):
     # permission_classes = [AllowAny]  # Allow anyone to attempt login
@@ -522,3 +564,19 @@ class LoginView(APIView):
 # "username":"Sahil123",
 # "password":"123"
 # }
+
+class LogoutView(APIView):
+    # permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        refresh_token = request.data.get('refresh')
+
+        if not refresh_token:
+            return Response({'error': 'Refresh token is required'}, status=400)
+
+        try:
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response({'message': 'Logout successful'})
+        except TokenError:
+            return Response({'error': 'Invalid or expired token'}, status=400)

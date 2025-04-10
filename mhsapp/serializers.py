@@ -73,3 +73,12 @@ class variation_OptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = variation_option
         fields = ['id', 'value', 'color_code', 'variation_id', 'variation']
+    
+# Product Serializer
+class ProductSerializer(serializers.ModelSerializer):
+
+    Sub_Category_id=SubCategorySerializer(read_only=True)
+
+    class Meta:
+        model=Product
+        fields=['Product_Description','Sub_Category_id','Availability','Stock','Price']
