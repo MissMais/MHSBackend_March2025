@@ -141,10 +141,30 @@ class CustomerView(APIView):
             user.delete()
             return Response(customer_serializer.errors)
 
-    def get(self, request):
-        customers = Customer.objects.all()
-        serializer = CustomerSerializer(customers, many=True)
-        return Response(serializer.data)
+    def get(self, request, pk = None):
+        if pk:
+            customers = Customer.objects.get(pk = pk)
+            serializer = CustomerSerializer(customers)
+            return Response(serializer.data)
+
+        else:    
+            customers = Customer.objects.all()
+            serializer = CustomerSerializer(customers, many=True)
+            return Response(serializer.data)
+    
+
+    def put(self, request, pk):
+        customer = Customer.objects.get(pk=pk)
+        serializer = CustomerSerializer(customer, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'Customer updated successfully'})
+        return Response(serializer.errors)
+
+    def delete(self, request, pk):
+        customer = Customer.objects.get(pk=pk)
+        customer.delete()
+        return Response({'message': 'Customer deleted successfully'})
 
 
 # EMPLOYEE PAYLOAD :-
@@ -327,15 +347,20 @@ class SubCategoryView(APIView):
             return Response({'message': 'SubCategory created successfully', 'data': serializer.data})
         return Response(serializer.errors)
 
-    def get(self,request,pk = None):
+    def get(self, request, pk=None):
         if pk:
             obj = SubCategory.objects.get(pk = pk)
             serializer = SubCategorySerializer(obj)
             return Response(serializer.data)
+
+        search_query = request.query_params.get('search', '')
+        if search_query:
+            subcategories = SubCategory.objects.filter(Sub_Category_Name__icontains=search_query)
         else:
-            obj = SubCategory.objects.all()
-            serializer = SubCategorySerializer(obj,many=True)
-            return Response(serializer.data)
+            subcategories = SubCategory.objects.all()
+
+        serializer = SubCategorySerializer(subcategories, many=True)
+        return Response(serializer.data)
 
     def put(self, request, pk):
         try:
@@ -366,6 +391,111 @@ class SubCategoryView(APIView):
 
 
 
+# {
+#     "variation_name":"uytrew"
+# }
+    
+class VariationView(APIView):
+    def post(self, request):
+        serializer = VariationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'Variation created successfully', 'data': serializer.data})
+        return Response(serializer.errors)
+
+    def get(self,request,pk = None):
+        if pk:
+            obj = variation.objects.get(pk = pk)
+            serializer = VariationSerializer(obj)
+            return Response(serializer.data)
+        else:
+            obj = variation.objects.all()
+            serializer = VariationSerializer(obj,many=True)
+            return Response(serializer.data)
+
+    def put(self, request, pk):
+        try:
+            VARIATION = variation.objects.get(pk=pk)
+        except variation.DoesNotExist:
+            return Response({'error': 'variation not found'})
+
+        serializer = VariationSerializer(VARIATION, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'variation updated successfully', 'data': serializer.data})
+        return Response(serializer.errors)
+
+    def delete(self,request, pk = None):
+        if pk:
+            try: 
+                obj = variation.objects.get(pk = pk)
+                obj.delete()
+                return Response('data deleted successfully')
+
+            except:
+                return Response('searching for the id is not found, plz enter valid id')
+      
+        else:
+            obj = variation.objects.all()
+            obj.delete()
+            return Response('all data is deleted successfully')
+        
+
+# {
+#     "variation_id":2,
+#     "value":"vgfdfdd",
+#     "color_code":"gefgfds"
+# }
+
+class Variation_Option_View(APIView):
+    def post(self, request):
+        serializer = variation_OptionSerializer(data = request.data)
+        if serializer.is_valid(): 
+            serializer.save()
+            return Response({'message': 'variation_Option created successfully', 'data': serializer.data})
+        return Response(serializer.errors)
+
+    def get(self, request, pk=None):
+        if pk:
+            obj = variation_option.objects.get(pk = pk)
+            serializer = variation_OptionSerializer(obj)
+            return Response(serializer.data)
+
+        search_query = request.query_params.get('search', '')
+        if search_query:
+            obj = variation_option.objects.filter(variaton_name__icontains=search_query)
+        else:
+            obj = variation_option.objects.all()
+
+        serializer = variation_OptionSerializer(obj, many=True)
+        return Response(serializer.data)
+
+    def put(self, request, pk):
+        try:
+            obj = variation_option.objects.get(pk=pk)
+        except SubCategory.DoesNotExist:
+            return Response({'error': 'variation_option not found'})
+
+        serializer = variation_OptionSerializer(obj, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'variation_option updated successfully', 'data': serializer.data})
+        return Response(serializer.errors)
+
+    def delete(self,request, pk = None):
+        if pk:
+            try: 
+                obj = variation_option.objects.get(pk = pk)
+                obj.delete()
+                return Response('data deleted successfully')
+
+            except:
+                return Response('searching for the id is not found, plz enter valid id')
+      
+        else:
+            obj = variation_option.objects.all()
+            obj.delete()
+            return Response('all data is deleted successfully')
 
 class ProductView(APIView):
     def get(self,request,pk=None):
@@ -410,16 +540,6 @@ class ProductView(APIView):
 # }
         
 
-
-
-
-
-
-
-
-
-
-
 class LoginView(APIView):
     # permission_classes = [AllowAny]  # Allow anyone to attempt login
 
@@ -460,4 +580,3 @@ class LogoutView(APIView):
             return Response({'message': 'Logout successful'})
         except TokenError:
             return Response({'error': 'Invalid or expired token'}, status=400)
-
