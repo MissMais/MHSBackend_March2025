@@ -14,4 +14,8 @@ urlpatterns = [
     path('cat/<int:pk>/', CategoryView.as_view()),
     path('subcat/', SubCategoryView.as_view()),
     path('subcat/<int:pk>/', SubCategoryView.as_view()),
+    path('var/', VariationView.as_view()),
+    path('var/<int:pk>/', VariationView.as_view()),
+    path('opt/',Variation_Option_View.as_view()),
+    path('opt/<int:pk>/',Variation_Option_View.as_view())
 ]

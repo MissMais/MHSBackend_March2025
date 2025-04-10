@@ -59,3 +59,17 @@ class SubCategorySerializer(serializers.ModelSerializer):
             'Category'
         ]
         
+
+class VariationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = variation
+        fields = ['id', 'variation_name']
+
+
+class variation_OptionSerializer(serializers.ModelSerializer):
+    variation_id = serializers.PrimaryKeyRelatedField(queryset=variation.objects.all()) 
+    variation = VariationSerializer(source='variation_id', read_only=True)  
+
+    class Meta:
+        model = variation_option
+        fields = ['id', 'value', 'color_code', 'variation_id', 'variation']

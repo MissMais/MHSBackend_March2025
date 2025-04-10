@@ -35,3 +35,11 @@ class Category(models.Model):
 class SubCategory(models.Model):
     Sub_Category_Name = models.CharField(max_length=100)
     Category_id = models.ForeignKey(Category, on_delete=models.CASCADE)
+
+class variation(models.Model):
+    variation_name = models.CharField(max_length=100)
+
+class variation_option(models.Model):
+    variation_id = models.ForeignKey(variation, on_delete=models.CASCADE)
+    value = models.CharField(max_length=100)
+    color_code = models.CharField(max_length=100)
