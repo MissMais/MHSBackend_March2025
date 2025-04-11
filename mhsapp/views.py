@@ -3,18 +3,12 @@ from rest_framework.response import Response
 from django.contrib.auth.hashers import make_password
 from .models import *
 from .serializers import *
-
 from django.contrib.auth import authenticate
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 
 
-
-
-# @api_view(["GET"])
-# def home(request):
-#     return Response("hello world")
 
 class HomeView(APIView):
     def get(self,request):
@@ -497,38 +491,6 @@ class Variation_Option_View(APIView):
             obj.delete()
             return Response('all data is deleted successfully')
 
-class ProductView(APIView):
-    def get(self,request,pk=None):
-        if pk:
-            obj=Product.objects.get(pk=pk)
-            serializer=ProductSerializer(obj,many=False)
-            return Response(serializer.data)
-        else:
-            obj=Product.objects.all()
-            serializer=ProductSerializer(obj,many=True)
-            return Response(serializer.data)
-        
-    def post(self,request):
-        data=request.data
-        serializer=ProductSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response("data added successfully")
-        return Response(serializer.errors)
-    
-    def put(self,request,pk=None):
-        data=request.data
-        obj=Product.objects.get(pk=pk)
-        serializer=ProductSerializer(obj,data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response("data updated successfully")
-        return Response(serializer.errors)
-    
-    def delete(self,request,pk=None):
-        obj=Product.objests.get(pk=pk)
-        obj.delete()
-        return Response("data deleted successfully")
 
 # product payload
 # {
@@ -580,3 +542,97 @@ class LogoutView(APIView):
             return Response({'message': 'Logout successful'})
         except TokenError:
             return Response({'error': 'Invalid or expired token'}, status=400)
+        
+
+# {
+# "Product_id":1,
+# "option_id":1
+# }
+
+class ProductView(APIView):
+    def get(self,request,pk=None):
+        if pk:
+            obj=Product.objects.get(pk=pk)
+            serializer=ProductSerializer(obj,many=False)
+            return Response(serializer.data)
+         
+        search_query = request.query_params.get('search', '')
+        if search_query:
+            pro = Product.objects.filter(Product_Description__icontains=search_query)
+        else:
+            pro = Product.objects.all()
+
+        serializer = ProductSerializer(pro, many=True)
+        return Response(serializer.data)
+        
+    def post(self,request):
+        data=request.data
+        serializer=ProductSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response("data added successfully")
+        return Response(serializer.errors)
+    
+    def put(self,request,pk=None):
+        data=request.data
+        obj=Product.objects.get(pk=pk)
+        serializer=ProductSerializer(obj,data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response("data updated successfully")
+        return Response(serializer.errors)
+    
+    def delete(self,request,pk=None):
+        obj=Product.objests.get(pk=pk)
+        obj.delete()
+        return Response("data deleted successfully")
+
+
+
+class Product_variation_Views(APIView):
+    def post(self,request):
+        obj = request.data
+        serializer = Product_variation_serializer(data = obj)
+        if serializer.is_valid():
+            serializer.save()
+            return Response('data added successfully')
+        return Response(serializer.errors)
+    
+    def get(self,request,pk = None):
+        if pk:
+            obj = Product_variation.objects.get(pk = pk)
+            serializer = Product_variation_serializer(obj)
+            return Response(serializer.data)
+        else:
+            obj=Product_variation.objects.all()
+            serializer=Product_variation_serializer(obj,many=True)
+            return Response(serializer.data)
+        
+    
+    def put(self, request, pk):
+        try:
+            obj = Product_variation.objects.get(pk=pk)
+        except Product_variation.DoesNotExist:
+            return Response({'error': 'product variation not found'})
+
+        serializer = Product_variation(obj, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'product variation updated successfully', 'data': serializer.data})
+        return Response(serializer.errors)
+    
+    def delete(self,request, pk = None):
+        if pk:
+            try: 
+                obj = variation_option.objects.get(pk = pk)
+                obj.delete()
+                return Response('data deleted successfully')
+
+            except:
+                return Response('searching for the id is not found, plz enter valid id')
+      
+        else:
+            obj = variation_option.objects.all()
+            obj.delete()
+            return Response('all data is deleted successfully')
+        

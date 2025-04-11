@@ -50,3 +50,7 @@ class Product(models.Model):
     Availability=models.IntegerField()
     Stock=models.IntegerField()
     Price=models.IntegerField()
+
+class Product_variation(models.Model):
+    Product_id = models.ForeignKey(Product,on_delete=models.CASCADE)
+    option_id = models.ForeignKey(variation_option, on_delete=models.CASCADE)
