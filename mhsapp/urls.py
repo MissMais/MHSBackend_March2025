@@ -23,4 +23,6 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout'),
     path('product/',ProductView.as_view(),name='product'),
     path('product/<int:pk>',ProductView.as_view(),name='product'),
+    path('pro/',Product_variation_Views.as_view()),
+    path('pro/<int:pk>',Product_variation_Views.as_view())
 ]
