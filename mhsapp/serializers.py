@@ -91,3 +91,17 @@ class Product_variation_serializer(serializers.ModelSerializer):
     class Meta:
         model = Product_variation
         fields=['Product_id','option_id','Products','variation_options']
+
+
+class ImageSerializer(serializers.ModelSerializer):
+    product_variation = Product_variation_serializer(source='Product_variation_id',read_only = True)
+    # image = serializers.ImageField(required=False)
+    class Meta:
+        model = image
+        fields = ['id','img_path','Product_variation_id','product_variation']
+    
+    def get_image(self, obj):
+        request = self.context.get('request')
+        if obj.image and hasattr(obj.image, 'url'):
+            return request.build_absolute_uri(obj.image.url)
+        return None
