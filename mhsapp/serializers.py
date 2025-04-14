@@ -58,12 +58,36 @@ class SubCategorySerializer(serializers.ModelSerializer):
             'id', 'Sub_Category_Name', 'Category_id',
             'Category'
         ]
+        
+# variation Serializer
+class VariationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = variation
+        fields = ['id', 'variation_name']
+
+# variations option Serializer
+class variation_OptionSerializer(serializers.ModelSerializer):
+    variation_id = serializers.PrimaryKeyRelatedField(queryset=variation.objects.all()) 
+    variation = VariationSerializer(source='variation_id', read_only=True)  
+
+    class Meta:
+        model = variation_option
+        fields = ['id', 'value', 'color_code', 'variation_id', 'variation']
     
 # Product Serializer
 class ProductSerializer(serializers.ModelSerializer):
 
-    Sub_Category_id=SubCategorySerializer(read_only=True)
+    Sub_Category=SubCategorySerializer(source='Sub_Category_id',read_only=True)
 
     class Meta:
         model=Product
-        fields=['Product_Description','Sub_Category_id','Availability','Stock','Price']
+        fields=['Product_Description','Sub_Category_id','Availability','Stock','Price','Sub_Category']
+    
+# Product variation Serializer
+class Product_variation_serializer(serializers.ModelSerializer):
+    Products = ProductSerializer(source='Product_id',read_only=True)
+    variation_options = variation_OptionSerializer(source='option_id',read_only=True)
+
+    class Meta:
+        model = Product_variation
+        fields=['Product_id','option_id','Products','variation_options']
