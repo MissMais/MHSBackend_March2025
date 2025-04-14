@@ -368,11 +368,14 @@ class SubCategoryView(APIView):
 
 
 class ProductView(APIView):
-    def get(self,request,pk=None):
+    def get(self,request,pk=None,cat=None):
         if pk:
             obj=Product.objects.get(pk=pk)
             serializer=ProductSerializer(obj,many=False)
             return Response(serializer.data)
+        elif cat:
+            
+            pass
         else:
             obj=Product.objects.all()
             serializer=ProductSerializer(obj,many=True)
