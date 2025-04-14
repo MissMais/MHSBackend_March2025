@@ -605,7 +605,8 @@ class Product_variation_Views(APIView):
             return Response(serializer.data)
         else:
             obj=Product_variation.objects.all()
-            serializer=Product_variation_serializer(obj,many=True)
+            serializer=Product_variation_serializer(obj,many=True,context={"request": request})
+
             return Response(serializer.data)
         
     
@@ -636,3 +637,51 @@ class Product_variation_Views(APIView):
             obj.delete()
             return Response('all data is deleted successfully')
         
+
+class image_View(APIView):
+
+    def post(self,request):
+        obj = request.data
+        serializer = ImageSerializer(data = obj)
+        if serializer.is_valid():
+            serializer.save()
+            return Response('data added successfully')
+        return Response(serializer.errors)
+    
+    def get(self,request,pk = None):
+        if pk:
+            obj = image.objects.get(pk = pk)
+            serializer = ImageSerializer(obj, context={"request": request})
+            return Response(serializer.data)
+        else:
+            obj=image.objects.all()
+            serializer=ImageSerializer(obj,many=True, context={"request": request})
+            return Response(serializer.data)
+        
+    
+    def put(self, request, pk):
+        try:
+            obj = image.objects.get(pk=pk)
+        except image.DoesNotExist:
+            return Response({'error': ' not found'})
+
+        serializer = ImageSerializer(obj, data=request.data, partial=True, context={"request": request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'image updated successfully', 'data': serializer.data})
+        return Response(serializer.errors)
+    
+    def delete(self,request, pk = None):
+        if pk:
+            try: 
+                obj = image.objects.get(pk = pk)
+                obj.delete()
+                return Response('data deleted successfully')
+
+            except:
+                return Response('searching for the id is not found, plz enter valid id')
+      
+        else:
+            obj = variation_option.objects.all()
+            obj.delete()
+            return Response('all data is deleted successfully')
