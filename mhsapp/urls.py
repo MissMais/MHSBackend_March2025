@@ -1,7 +1,16 @@
-from django.urls import path
+from django.urls import path,include
 from .views import *
+from rest_framework.routers import DefaultRouter
+from django.conf import settings
+from django.conf.urls.static import static
+
+
+
+router=DefaultRouter()
+router.register('images',ImageView)
 
 urlpatterns = [
+    path('',include(router.urls)),
     path('',HomeView.as_view()),
     path('user/', UserView.as_view()),
     path('user/<int:pk>/', UserView.as_view()),
@@ -25,5 +34,10 @@ urlpatterns = [
     path('product/<int:pk>',ProductView.as_view(),name='product'),
     path('product/<str:cat>',ProductView.as_view(),name='product'),
     path('pro/',Product_variation_Views.as_view()),
-    path('pro/<int:pk>',Product_variation_Views.as_view())
+    path('pro/<int:pk>',Product_variation_Views.as_view()),
+    # path('image',ImageView.as_view()),
+    # path('image/<int:pk>',ImageView.as_view()),
+    
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

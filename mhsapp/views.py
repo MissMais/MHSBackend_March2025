@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
+from rest_framework import viewsets
 
 
 
@@ -584,7 +585,7 @@ class ProductView(APIView):
         return Response(serializer.errors)
     
     def delete(self,request,pk=None):
-        obj=Product.objests.get(pk=pk)
+        obj=Product.objects.get(pk=pk)
         obj.delete()
         return Response("data deleted successfully")
 
@@ -637,3 +638,56 @@ class Product_variation_Views(APIView):
             obj.delete()
             return Response('all data is deleted successfully')
         
+
+# class ImageView(APIView):
+#     def get(self,request,pk=None):
+#         obj=Image.objects.all()
+#         serializer=ImageSerializer(obj,many=True)
+#         return Response(serializer.data)
+    
+#     def post(self,request):
+#         serializer=ImageSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response("image added successfully")
+#         return Response(serializer.errors)
+    
+#     def put(self,request,pk=None):
+#         data=request.data
+#         obj=Image.objects.get(pk=pk)
+#         serializer=ImageSerializer(obj,data=data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response("image updated successfully")
+#         return Response(serializer.errors)
+    
+#     def delete(self,request,pk=None):
+#         obj=Image.objects.get(pk=pk)
+#         obj.delete()
+#         return Response("image deleted successfully")
+
+
+
+# Image Crud
+
+class ImageView(viewsets.ModelViewSet):
+    queryset=Image.objects.all()
+    serializer_class=ImageSerializer
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -81,7 +81,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model=Product
-        fields=['Product_Description','Sub_Category_id','Availability','Stock','Price','Sub_Category']
+        fields=['id','Product_Description','Sub_Category_id','Availability','Stock','Price','Sub_Category']
     
 # Product variation Serializer
 class Product_variation_serializer(serializers.ModelSerializer):
@@ -91,3 +91,8 @@ class Product_variation_serializer(serializers.ModelSerializer):
     class Meta:
         model = Product_variation
         fields=['Product_id','option_id','Products','variation_options']
+
+class ImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Image
+        fields='__all__'
