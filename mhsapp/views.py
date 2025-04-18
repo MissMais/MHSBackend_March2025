@@ -609,7 +609,8 @@ class Product_variation_Views(APIView):
             return Response(serializer.data)
         else:
             obj=Product_variation.objects.all()
-            serializer=Product_variation_serializer(obj,many=True)
+            serializer=Product_variation_serializer(obj,many=True,context={"request": request})
+
             return Response(serializer.data)
         
     
@@ -678,10 +679,6 @@ class ImageView(viewsets.ModelViewSet):
     permission_classes=[AllowAny]
 
 
-
-# search_query=request.query_params.get('search','')
-# if search_query:
-#     data=Product.objects.filter(product_description__icontains=search_query)
 
 
 
