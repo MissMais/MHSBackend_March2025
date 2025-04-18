@@ -10,8 +10,8 @@ router=DefaultRouter()
 router.register('images',ImageView)
 
 urlpatterns = [
-    path('',include(router.urls)),
     path('',HomeView.as_view()),
+    path('',include(router.urls)),
     path('user/', UserView.as_view()),
     path('user/<int:pk>/', UserView.as_view()),
     path('cust/', CustomerView.as_view()),
@@ -32,11 +32,15 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout'),
     path('product/',ProductView.as_view(),name='product'),
     path('product/<int:pk>',ProductView.as_view(),name='product'),
-    path('product/<str:cat>',ProductView.as_view(),name='product'),
+    # path('product/<str:cat>',ProductView.as_view(),name='product'),
     path('pro/',Product_variation_Views.as_view()),
     path('pro/<int:pk>',Product_variation_Views.as_view()),
+
+    # Image
     # path('image',ImageView.as_view()),
     # path('image/<int:pk>',ImageView.as_view()),
+    
+    
     
 ]
 if settings.DEBUG:

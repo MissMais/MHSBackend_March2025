@@ -80,6 +80,7 @@ WSGI_APPLICATION = 'mhsproject.wsgi.application'
 CORS_ALLOWED_ORIGINS = [
   "http://localhost:3000",  # frontend domain
   "http://127.0.0.1:3000",
+  "http://localhost:5173",
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True

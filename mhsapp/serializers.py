@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from .models import *
+# from drf_extra_fields.fields import Base64ImageField
+import base64
 
 # User Serializer
 class UserSerializer(serializers.ModelSerializer):
@@ -92,7 +94,19 @@ class Product_variation_serializer(serializers.ModelSerializer):
         model = Product_variation
         fields=['Product_id','option_id','Products','variation_options']
 
+
+class Base64ImageField(serializers.ImageField):
+    def to_representation(self, value):
+        if not value:
+            return None
+        with value.open('rb') as image_file:
+            return base64.b64encode(image_file.read()).decode()
+
 class ImageSerializer(serializers.ModelSerializer):
+    img_path = Base64ImageField()
+
     class Meta:
         model=Image
-        fields='__all__'
+        fields=['id','img_path','product_variation_id']
+
+    

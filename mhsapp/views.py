@@ -562,9 +562,11 @@ class ProductView(APIView):
         if search_query:
             pro = Product.objects.filter(Product_Description__icontains=search_query)
         else:
-            pro = Product.objects.all()
+            pro = Product.objects.all().order_by('Price')
 
         serializer = ProductSerializer(pro, many=True)
+        # for i in range(serializer):
+        #     data=serializer.sort()
         return Response(serializer.data)
         
     def post(self,request):
@@ -673,10 +675,13 @@ class Product_variation_Views(APIView):
 class ImageView(viewsets.ModelViewSet):
     queryset=Image.objects.all()
     serializer_class=ImageSerializer
+    permission_classes=[AllowAny]
 
 
 
-
+# search_query=request.query_params.get('search','')
+# if search_query:
+#     data=Product.objects.filter(product_description__icontains=search_query)
 
 
 

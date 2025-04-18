@@ -56,7 +56,7 @@ class Product_variation(models.Model):
     option_id = models.ForeignKey(variation_option, on_delete=models.CASCADE)
 
 class Image(models.Model):
-    img_path=models.ImageField(upload_to='Images', blank=True, null=True)
+    img_path=models.ImageField(upload_to='images', blank=True, null=True)
     product_variation_id=models.ForeignKey(Product_variation, on_delete=models.CASCADE)
 
 
