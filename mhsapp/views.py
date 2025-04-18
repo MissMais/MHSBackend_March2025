@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
+from rest_framework import viewsets
 
 
 
@@ -402,6 +403,7 @@ class VariationView(APIView):
             obj = variation.objects.get(pk = pk)
             serializer = VariationSerializer(obj)
             return Response(serializer.data)
+
         else:
             obj = variation.objects.all()
             serializer = VariationSerializer(obj,many=True)
@@ -560,9 +562,11 @@ class ProductView(APIView):
         if search_query:
             pro = Product.objects.filter(Product_Description__icontains=search_query)
         else:
-            pro = Product.objects.all()
+            pro = Product.objects.all().order_by('Price')
 
         serializer = ProductSerializer(pro, many=True)
+        # for i in range(serializer):
+        #     data=serializer.sort()
         return Response(serializer.data)
         
     def post(self,request):
@@ -583,7 +587,7 @@ class ProductView(APIView):
         return Response(serializer.errors)
     
     def delete(self,request,pk=None):
-        obj=Product.objests.get(pk=pk)
+        obj=Product.objects.get(pk=pk)
         obj.delete()
         return Response("data deleted successfully")
 
@@ -638,50 +642,54 @@ class Product_variation_Views(APIView):
             return Response('all data is deleted successfully')
         
 
-class image_View(APIView):
-
-    def post(self,request):
-        obj = request.data
-        serializer = ImageSerializer(data = obj)
-        if serializer.is_valid():
-            serializer.save()
-            return Response('data added successfully')
-        return Response(serializer.errors)
+# class ImageView(APIView):
+#     def get(self,request,pk=None):
+#         obj=Image.objects.all()
+#         serializer=ImageSerializer(obj,many=True)
+#         return Response(serializer.data)
     
-    def get(self,request,pk = None):
-        if pk:
-            obj = image.objects.get(pk = pk)
-            serializer = ImageSerializer(obj, context={"request": request})
-            return Response(serializer.data)
-        else:
-            obj=image.objects.all()
-            serializer=ImageSerializer(obj,many=True, context={"request": request})
-            return Response(serializer.data)
-        
+#     def post(self,request):
+#         serializer=ImageSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response("image added successfully")
+#         return Response(serializer.errors)
     
-    def put(self, request, pk):
-        try:
-            obj = image.objects.get(pk=pk)
-        except image.DoesNotExist:
-            return Response({'error': ' not found'})
-
-        serializer = ImageSerializer(obj, data=request.data, partial=True, context={"request": request})
-        if serializer.is_valid():
-            serializer.save()
-            return Response({'message': 'image updated successfully', 'data': serializer.data})
-        return Response(serializer.errors)
+#     def put(self,request,pk=None):
+#         data=request.data
+#         obj=Image.objects.get(pk=pk)
+#         serializer=ImageSerializer(obj,data=data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response("image updated successfully")
+#         return Response(serializer.errors)
     
-    def delete(self,request, pk = None):
-        if pk:
-            try: 
-                obj = image.objects.get(pk = pk)
-                obj.delete()
-                return Response('data deleted successfully')
+#     def delete(self,request,pk=None):
+#         obj=Image.objects.get(pk=pk)
+#         obj.delete()
+#         return Response("image deleted successfully")
 
-            except:
-                return Response('searching for the id is not found, plz enter valid id')
-      
-        else:
-            obj = variation_option.objects.all()
-            obj.delete()
-            return Response('all data is deleted successfully')
+
+
+# Image Crud
+
+class ImageView(viewsets.ModelViewSet):
+    queryset=Image.objects.all()
+    serializer_class=ImageSerializer
+    permission_classes=[AllowAny]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

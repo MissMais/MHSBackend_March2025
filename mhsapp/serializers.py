@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from .models import *
+# from drf_extra_fields.fields import Base64ImageField
+import base64
 
 # User Serializer
 class UserSerializer(serializers.ModelSerializer):
@@ -81,7 +83,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model=Product
-        fields=['Product_Description','Sub_Category_id','Availability','Stock','Price','Sub_Category']
+        fields=['id','Product_Description','Sub_Category_id','Availability','Stock','Price','Sub_Category']
     
 # Product variation Serializer
 class Product_variation_serializer(serializers.ModelSerializer):
@@ -93,15 +95,18 @@ class Product_variation_serializer(serializers.ModelSerializer):
         fields=['Product_id','option_id','Products','variation_options']
 
 
+class Base64ImageField(serializers.ImageField):
+    def to_representation(self, value):
+        if not value:
+            return None
+        with value.open('rb') as image_file:
+            return base64.b64encode(image_file.read()).decode()
+
 class ImageSerializer(serializers.ModelSerializer):
-    product_variation = Product_variation_serializer(source='Product_variation_id',read_only = True)
-    # image = serializers.ImageField(required=False)
+    img_path = Base64ImageField()
+
     class Meta:
-        model = image
-        fields = ['id','img_path','Product_variation_id','product_variation']
+        model=Image
+        fields=['id','img_path','product_variation_id']
+
     
-    def get_image(self, obj):
-        request = self.context.get('request')
-        if obj.image and hasattr(obj.image, 'url'):
-            return request.build_absolute_uri(obj.image.url)
-        return None
