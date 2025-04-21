@@ -35,10 +35,12 @@ urlpatterns = [
     # path('product/<str:cat>',ProductView.as_view(),name='product'),
     path('pro/',Product_variation_Views.as_view()),
     path('pro/<int:pk>',Product_variation_Views.as_view()),
-
     # Image
     # path('image',ImageView.as_view()),
     # path('image/<int:pk>',ImageView.as_view()),
+    path('cart_item/',Cart_item.as_view()),
+    path('cart_item/<int:pk>',Cart_item.as_view()),
+    path('change_password',Change_Password.as_view())
     
     
     

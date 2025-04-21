@@ -59,6 +59,10 @@ class Image(models.Model):
     img_path=models.ImageField(upload_to='images', blank=True, null=True)
     product_variation_id=models.ForeignKey(Product_variation, on_delete=models.CASCADE)
 
+class Cart_Item(models.Model):
+    Product_id=models.ForeignKey(Product, on_delete=models.CASCADE)
+    Quantity=models.IntegerField()
+    Cart_Total=models.IntegerField()
 
 
 

@@ -158,3 +158,15 @@ REST_FRAMEWORK = {
 } 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+# For email
+
+EMAIL_HOST='smtp.gmail.com'
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+EMAIL_HOST_USER='sk5742081@gmail.com'
+EMAIL_HOST_PASSWORD='acgbqspgrhuuxcfd'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+# acgb qspg rhuu xcfd

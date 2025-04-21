@@ -110,3 +110,12 @@ class ImageSerializer(serializers.ModelSerializer):
         fields=['id','img_path','product_variation_id']
 
     
+class Cart_Item_Serializer(serializers.ModelSerializer):
+    product_details=ProductSerializer(source='Product_id',read_only=True)
+    Product_id=serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
+    
+
+
+    class Meta:
+        model=Cart_Item
+        fields=['id','Product_id','product_details','Quantity','Cart_Total']

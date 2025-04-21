@@ -8,8 +8,12 @@ from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework import viewsets
+from django.conf import settings
+from django.core.mail import EmailMessage
 
-
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+import re
 
 class HomeView(APIView):
     def get(self,request):
@@ -176,9 +180,14 @@ class CustomerView(APIView):
 #   "contact": "9876543210"
 # }
 
+EMAIL_REGEX = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
 
 class EmployeeView(APIView):
     def post(self, request):
+        email = request.data.get('email')
+        if not re.match(EMAIL_REGEX, email):
+            return Response({'error': 'Invalid email format'}, status=400)
+        
         user_data = {
             "first_name": request.data.get("first_name"),
             "last_name": request.data.get("last_name"),
@@ -202,8 +211,20 @@ class EmployeeView(APIView):
         }
         employee_serializer = EmployeeSerializer(data=employee_data)
         if employee_serializer.is_valid():
+
+            email=request.data.get('email')
+            email2=EmailMessage(
+                'Welcome mail from Django-rest',
+                'Welcome',
+                settings.EMAIL_HOST_USER,
+                [email]
+            )
+            email2.send(fail_silently=True)
+
             employee_serializer.save()
-            return Response({'message': 'Employee created successfully'})
+
+
+            return Response({'message': 'Employee created successfully and email send successfully'})
         else:
             user.delete()
             return Response(employee_serializer.errors)
@@ -680,9 +701,67 @@ class ImageView(viewsets.ModelViewSet):
 
 
 
+class Cart_item(APIView):
+    def get(self,request,pk=None):
+        if pk:
+            try:
+                obj=Cart_Item.objects.get(pk=pk)
+                serializer=Cart_Item_Serializer(obj,many=False)
+                return Response(serializer.data)
+            except:
+                return Response(serializer.errors)
+        else:
+            obj=Cart_Item.objects.all()
+            serializer=Cart_Item_Serializer(obj,many=True)
+            return Response(serializer.data)
+        
+    def post(self,request):
+        data=request.data
+        serializer=Cart_Item_Serializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors)
+        
+    def put(self,request,pk=None):
+        data=request.data
+        obj=Cart_Item.objects.get(pk=pk)
+        serializer=Cart_Item_Serializer(obj,data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors)
+        
+    def delete(self,request,pk=None):
+        obj=Cart_Item.objects.get(pk=pk)
+        obj.delete()
+        return Response("data deleted successfully")
+        
 
+from django.contrib.auth.hashers import check_password
 
+class Change_Password(APIView):
+    def post(self,request):
+        permission_classes=[IsAuthenticated]
+        user=request.user
+        old_password=request.data.get('old_password')
+        new_password=request.data.get('new_password')
+        confirm_password=request.data.get('confirm_password')
 
+        if not check_password(old_password,user.password):
+            return Response("the old password is incorrect" ,status=400)
+        
+        if len(new_password)<6:
+            return Response("The new password must be of 6 digits or above")
+        
+        if new_password != confirm_password:
+            return Response("The new password does not match with the confirmed password")
+        
+        user.set_password(new_password)
+        user.save()
+        return Response("Password changed successfully")
 
 
 
