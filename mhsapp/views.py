@@ -10,10 +10,10 @@ from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework import viewsets
 from django.conf import settings
 from django.core.mail import EmailMessage
-
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 import re
+from django.contrib.auth.hashers import check_password
 
 class HomeView(APIView):
     def get(self,request):
@@ -740,7 +740,7 @@ class Cart_item(APIView):
         return Response("data deleted successfully")
         
 
-from django.contrib.auth.hashers import check_password
+
 
 class Change_Password(APIView):
     def post(self,request):
