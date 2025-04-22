@@ -728,3 +728,6 @@ class Cart_View(APIView):
             obj=Cart.objects.all()
             serializer=Cart_Serializer(obj,many=True)
             return Response(serializer.data)
+
+
+            
