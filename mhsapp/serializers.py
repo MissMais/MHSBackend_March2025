@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import *
+import base64
 
 # User Serializer
 class UserSerializer(serializers.ModelSerializer):
@@ -81,7 +82,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model=Product
-        fields=['Product_Description','Sub_Category_id','Availability','Stock','Price','Sub_Category']
+        fields=['id','Product_Description','Sub_Category_id','Availability','Stock','Price','Sub_Category']
     
 # Product variation Serializer
 class Product_variation_serializer(serializers.ModelSerializer):
@@ -90,18 +91,36 @@ class Product_variation_serializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product_variation
-        fields=['Product_id','option_id','Products','variation_options']
+        fields=['id','Product_id','option_id','Products','variation_options']
+
+
+
+class encoder(serializers.ImageField):
+    def to_representation(self, value):
+        if not value:
+            return None
+        
+        # If the value is already a bytes-like object (i.e., base64 string), return it directly
+        if isinstance(value, bytes):
+            return base64.b64encode(value).decode('utf-8')
+
+        # Otherwise, handle the ImageField
+        with value.open('rb') as image_file:
+            return base64.b64encode(image_file.read()).decode('utf-8')
 
 
 class ImageSerializer(serializers.ModelSerializer):
-    product_variation = Product_variation_serializer(source='Product_variation_id',read_only = True)
-    # image = serializers.ImageField(required=False)
+    product_variation = Product_variation_serializer(source='Product_variation_id', read_only=True)
+    img_path = encoder()  # Use the custom encoder for the ImageField
+    
     class Meta:
         model = image
-        fields = ['id','img_path','Product_variation_id','product_variation']
-    
-    def get_image(self, obj):
-        request = self.context.get('request')
-        if obj.image and hasattr(obj.image, 'url'):
-            return request.build_absolute_uri(obj.image.url)
-        return None
+        fields = ['id', 'img_path', 'Product_variation_id', 'product_variation']
+
+
+class Cart_Serializer(serializers.ModelSerializer):
+    Customer_Data = CustomerSerializer(source='Customer_id',read_only=True)
+
+    class Meta:
+        model = Cart
+        fields = ['id', 'Customer_id', 'Customer_Data']

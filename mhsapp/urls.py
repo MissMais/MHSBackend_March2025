@@ -28,7 +28,9 @@ urlpatterns = [
     path('pro/',Product_variation_Views.as_view()),
     path('pro/<int:pk>',Product_variation_Views.as_view()),
     path('img/',image_View.as_view()),
-    path('img/<int:pk>/',image_View.as_view())
+    path('img/<int:pk>/',image_View.as_view()),
+    path('cart/',Cart_View.as_view()),
+    path('cart/<int:pk>/',Cart_View.as_view())
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

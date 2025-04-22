@@ -129,11 +129,22 @@ class CustomerView(APIView):
         customer_serializer = CustomerSerializer(data=customer_data)
         customer_serializer.is_valid(raise_exception=True)
         if customer_serializer.is_valid():
-            customer_serializer.save()
-            return Response({'message': 'Customer created successfully'})
+            cust = customer_serializer.save()
         else:
             user.delete()
             return Response(customer_serializer.errors)
+        
+        Cart_data = {
+            "Customer_id": cust.id
+        }
+        Cart_Serial = Cart_Serializer(data=Cart_data)
+        if Cart_Serial.is_valid():
+            Cart_Serial.save()
+            return Response({'message': 'Customer created successfully'})
+        else:
+            user.delete()
+            return Response(Cart_Serial.errors)
+        
 
     def get(self, request, pk = None):
         if pk:
@@ -147,7 +158,7 @@ class CustomerView(APIView):
             return Response(serializer.data)
     
 
-    def put(self, request, pk):
+    def put(self, request, pk = None):
         customer = Customer.objects.get(pk=pk)
         serializer = CustomerSerializer(customer, data=request.data, partial=True)
         if serializer.is_valid():
@@ -155,10 +166,16 @@ class CustomerView(APIView):
             return Response({'message': 'Customer updated successfully'})
         return Response(serializer.errors)
 
-    def delete(self, request, pk):
-        customer = Customer.objects.get(pk=pk)
-        customer.delete()
-        return Response({'message': 'Customer deleted successfully'})
+    def delete(self, request, pk = None):
+        if pk:
+            obj = Customer.objects.get(pk=pk)
+            obj.delete()
+            return Response({'message': 'Customer deleted successfully'})
+        else:
+            obj = Customer.objects.all()
+            obj.delete()
+            return Response({'message': 'All data deleted successfully'})
+
 
 
 # EMPLOYEE PAYLOAD :-
@@ -217,7 +234,7 @@ class EmployeeView(APIView):
             serializer = EmployeeSerializer(obj,many=True)
             return Response(serializer.data)
 
-    def put(self, request, pk):
+    def put(self, request, pk = None):
         employee = Employee.objects.get(pk=pk)
         serializer = EmployeeSerializer(employee, data=request.data, partial=True)
         if serializer.is_valid():
@@ -225,10 +242,17 @@ class EmployeeView(APIView):
             return Response({'message': 'Employee updated successfully', 'data': serializer.data})
         return Response(serializer.errors)
 
-    def delete(self, request, pk):
-        employee = Employee.objects.get(pk=pk)
-        employee.delete()
-        return Response({'message': 'Employee deleted successfully'})
+    def delete(self, request, pk = None):
+        if pk:
+
+            employee = Employee.objects.get(pk=pk)
+            employee.delete()
+            return Response({'message': 'Employee deleted successfully'})
+        else:
+            employee = Employee.objects.all()
+            employee.delete()
+            return Response({'message': 'All Employee deleted successfully'})
+
 
 
 
@@ -264,14 +288,18 @@ class AddressView(APIView):
             return Response({'message': 'Address updated successfully', 'data': serializer.data})
         return Response(serializer.errors)
 
-    def delete(self, request, pk):
-        try:
-            address = Address.objects.get(pk=pk)
-        except Address.DoesNotExist:
-            return Response({'error': 'Address not found'})
-
-        address.delete()
-        return Response({'message': 'Address deleted successfully'})
+    def delete(self, request, pk=None):
+        if pk:
+            try:
+                address = Address.objects.get(pk=pk)
+            except Address.DoesNotExist:
+                return Response({'error': 'Address not found'})
+            address.delete()
+            return Response({'message': 'Address deleted successfully'})
+        else:
+            address = Address.objects.all()
+            address.delete()
+            return Response({'message': 'all data deleted successfully' })
     
 
 # {
@@ -492,15 +520,7 @@ class Variation_Option_View(APIView):
             return Response('all data is deleted successfully')
 
 
-# product payload
-# {
-# "Product_Description":"good quality clothes",
-# "Sub_Category_id":1,
-# "Availability":13,
-# "Stock":45,
-# "Price":4000
-# }
-        
+    
 
 class LoginView(APIView):
     # permission_classes = [AllowAny]  # Allow anyone to attempt login
@@ -544,11 +564,16 @@ class LogoutView(APIView):
             return Response({'error': 'Invalid or expired token'}, status=400)
         
 
-# {
-# "Product_id":1,
-# "option_id":1
-# }
 
+# product payload
+# {
+# "Product_Description":"good quality clothes",
+# "Sub_Category_id":1,
+# "Availability":13,
+# "Stock":45,
+# "Price":4000
+# }
+    
 class ProductView(APIView):
     def get(self,request,pk=None):
         if pk:
@@ -589,6 +614,11 @@ class ProductView(APIView):
 
 
 
+# {
+# "Product_id":1,
+# "option_id":1
+# }
+
 class Product_variation_Views(APIView):
     def post(self,request):
         obj = request.data
@@ -605,7 +635,7 @@ class Product_variation_Views(APIView):
             return Response(serializer.data)
         else:
             obj=Product_variation.objects.all()
-            serializer=Product_variation_serializer(obj,many=True,context={"request": request})
+            serializer=Product_variation_serializer(obj,many=True)
 
             return Response(serializer.data)
         
@@ -616,7 +646,7 @@ class Product_variation_Views(APIView):
         except Product_variation.DoesNotExist:
             return Response({'error': 'product variation not found'})
 
-        serializer = Product_variation(obj, data=request.data, partial=True)
+        serializer = Product_variation_serializer(obj, data=request.data, partial=True, context={"request": request})
         if serializer.is_valid():
             serializer.save()
             return Response({'message': 'product variation updated successfully', 'data': serializer.data})
@@ -625,7 +655,7 @@ class Product_variation_Views(APIView):
     def delete(self,request, pk = None):
         if pk:
             try: 
-                obj = variation_option.objects.get(pk = pk)
+                obj = Product_variation.objects.get(pk = pk)
                 obj.delete()
                 return Response('data deleted successfully')
 
@@ -633,7 +663,7 @@ class Product_variation_Views(APIView):
                 return Response('searching for the id is not found, plz enter valid id')
       
         else:
-            obj = variation_option.objects.all()
+            obj = Product_variation.objects.all()
             obj.delete()
             return Response('all data is deleted successfully')
         
@@ -682,6 +712,19 @@ class image_View(APIView):
                 return Response('searching for the id is not found, plz enter valid id')
       
         else:
-            obj = variation_option.objects.all()
+            obj = image.objects.all()
             obj.delete()
             return Response('all data is deleted successfully')
+
+
+
+class Cart_View(APIView):
+    def get(self,request,pk = None):
+        if pk:
+            obj = Cart.objects.get(pk = pk)
+            serializer = Cart(obj)
+            return Response(serializer.data)
+        else:
+            obj=Cart.objects.all()
+            serializer=Cart_Serializer(obj,many=True)
+            return Response(serializer.data)

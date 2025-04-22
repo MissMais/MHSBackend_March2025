@@ -59,3 +59,8 @@ class Product_variation(models.Model):
 class image(models.Model):
     img_path = models.ImageField(upload_to='images/', blank=True, null=True)
     Product_variation_id = models.ForeignKey(Product_variation,on_delete=models.CASCADE)
+
+
+class Cart(models.Model):
+    Customer_id = models.OneToOneField(Customer,on_delete=models.CASCADE)
+    
