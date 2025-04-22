@@ -40,7 +40,7 @@ urlpatterns = [
     # path('image/<int:pk>',ImageView.as_view()),
     path('cart_item/',Cart_item.as_view()),
     path('cart_item/<int:pk>',Cart_item.as_view()),
-    path('change_password',Change_Password.as_view())
+    path('change_password/',Change_Password.as_view())
     
     
     
