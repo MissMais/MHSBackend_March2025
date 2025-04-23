@@ -109,6 +109,14 @@ class ImageSerializer(serializers.ModelSerializer):
         model=Image
         fields=['id','img_path','product_variation_id']
 
+
+class Cart_Serializer(serializers.ModelSerializer):
+    Customer_Data = CustomerSerializer(source='Customer_id',read_only=True)
+
+    class Meta:
+        model = Cart
+        fields = ['id', 'Customer_id', 'Customer_Data']
+
     
 class Cart_Item_Serializer(serializers.ModelSerializer):
     product_details=ProductSerializer(source='Product_id',read_only=True)

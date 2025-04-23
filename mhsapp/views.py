@@ -88,6 +88,8 @@ class UserView(APIView):
 
 
 # CUSTOMER REGISTRATION 
+
+
 class CustomerView(APIView):
     def post(self, request):
         
@@ -130,15 +132,24 @@ class CustomerView(APIView):
             "Email": request.data.get("Email"),
             "contact": request.data.get("contact")
         }
-        # print(customer_data) 
         customer_serializer = CustomerSerializer(data=customer_data)
         customer_serializer.is_valid(raise_exception=True)
         if customer_serializer.is_valid():
-            customer_serializer.save()
-            return Response({'message': 'Customer created successfully'})
+            cust = customer_serializer.save()
         else:
             user.delete()
             return Response(customer_serializer.errors)
+        
+        Cart_data = {
+            "Customer_id": cust.id
+        }
+        Cart_Serial = Cart_Serializer(data=Cart_data)
+        if Cart_Serial.is_valid():
+            Cart_Serial.save()
+            return Response({'message': 'Customer created successfully'})
+        else:
+            user.delete()
+            return Response(Cart_Serial.errors)
 
     def get(self, request, pk = None):
         if pk:
@@ -150,9 +161,8 @@ class CustomerView(APIView):
             customers = Customer.objects.all()
             serializer = CustomerSerializer(customers, many=True)
             return Response(serializer.data)
-    
 
-    def put(self, request, pk):
+    def put(self, request, pk = None):
         customer = Customer.objects.get(pk=pk)
         serializer = CustomerSerializer(customer, data=request.data, partial=True)
         if serializer.is_valid():
@@ -160,10 +170,16 @@ class CustomerView(APIView):
             return Response({'message': 'Customer updated successfully'})
         return Response(serializer.errors)
 
-    def delete(self, request, pk):
-        customer = Customer.objects.get(pk=pk)
-        customer.delete()
-        return Response({'message': 'Customer deleted successfully'})
+    def delete(self, request, pk = None):
+        if pk:
+            obj = Customer.objects.get(pk=pk)
+            obj.delete()
+            return Response({'message': 'Customer deleted successfully'})
+        else:
+            obj = Customer.objects.all()
+            obj.delete()
+            return Response({'message': 'All data deleted successfully'})
+
 
 
 # EMPLOYEE PAYLOAD :-
@@ -661,34 +677,6 @@ class Product_variation_Views(APIView):
             obj = variation_option.objects.all()
             obj.delete()
             return Response('all data is deleted successfully')
-        
-
-# class ImageView(APIView):
-#     def get(self,request,pk=None):
-#         obj=Image.objects.all()
-#         serializer=ImageSerializer(obj,many=True)
-#         return Response(serializer.data)
-    
-#     def post(self,request):
-#         serializer=ImageSerializer(data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response("image added successfully")
-#         return Response(serializer.errors)
-    
-#     def put(self,request,pk=None):
-#         data=request.data
-#         obj=Image.objects.get(pk=pk)
-#         serializer=ImageSerializer(obj,data=data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response("image updated successfully")
-#         return Response(serializer.errors)
-    
-#     def delete(self,request,pk=None):
-#         obj=Image.objects.get(pk=pk)
-#         obj.delete()
-#         return Response("image deleted successfully")
 
 
 
@@ -699,7 +687,20 @@ class ImageView(viewsets.ModelViewSet):
     serializer_class=ImageSerializer
     permission_classes=[AllowAny]
 
+# CART
 
+class Cart_View(APIView):
+    def get(self,request,pk = None):
+        if pk:
+            obj = Cart.objects.get(pk = pk)
+            serializer = Cart(obj)
+            return Response(serializer.data)
+        else:
+            obj=Cart.objects.all()
+            serializer=Cart_Serializer(obj,many=True)
+            return Response(serializer.data)
+
+# CART ITEM
 
 class Cart_item(APIView):
     def get(self,request,pk=None):
