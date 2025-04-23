@@ -763,13 +763,3 @@ class Change_Password(APIView):
         user.set_password(new_password)
         user.save()
         return Response("Password changed successfully")
-
-
-
-
-
-
-
-
-
-
