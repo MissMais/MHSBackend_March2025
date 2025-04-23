@@ -32,12 +32,10 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout'),
     path('product/',ProductView.as_view(),name='product'),
     path('product/<int:pk>',ProductView.as_view(),name='product'),
-    # path('product/<str:cat>',ProductView.as_view(),name='product'),
     path('product_variation/',Product_variation_Views.as_view()),
     path('product_variation/<int:pk>',Product_variation_Views.as_view()),
-    # Image
-    # path('image',ImageView.as_view()),
-    # path('image/<int:pk>',ImageView.as_view()),
+    path('cart/',Cart_View.as_view()),
+    path('cart/<int:pk>/',Cart_View.as_view()),
     path('cart_item/',Cart_item.as_view()),
     path('cart_item/<int:pk>',Cart_item.as_view()),
     path('change_password/',Change_Password.as_view())
